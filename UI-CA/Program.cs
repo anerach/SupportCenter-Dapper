@@ -115,6 +115,7 @@ namespace SC.UI.CA
       Console.WriteLine("{0,-15}: {1}", "Gebruiker", ticket.AccountId);
       Console.WriteLine("{0,-15}: {1}", "Datum", ticket.DateOpened.ToString("dd/MM/yyyy"));
       Console.WriteLine("{0,-15}: {1}", "Status", ticket.State);
+      Console.WriteLine("{0,-15}: {1}", "Replies", ticket.Responses.Count);
 
       if (ticket is HardwareTicket)
         Console.WriteLine("{0,-15}: {1}", "Toestel", ((HardwareTicket)ticket).DeviceName);

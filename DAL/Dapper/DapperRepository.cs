@@ -21,7 +21,7 @@ namespace SC.DAL.Dapper
 
         private delegate void OneToManyDelegate(object parent, object child);
 
-        private IEnumerable<TParent> OneToMany<TParent, TChild>(string sql, OneToManyDelegate oneToMany) // delegate or w/e import function w/ attributes
+        private IEnumerable<TParent> OneToMany<TParent, TChild>(string sql, OneToManyDelegate oneToMany, object data = null)
         {
             var lookup = new Dictionary<int, TParent>();
 
@@ -40,13 +40,8 @@ namespace SC.DAL.Dapper
 
                     oneToMany(parent, c);
 
-                    //if (parent.Responses == null)
-                    //    parent.Responses = new List<TicketResponse>();
-
-                    //parent.Responses.Add(r);
-
                     return parent;
-                });
+                }, data);
 
                 conn.Close();
             }
@@ -54,54 +49,64 @@ namespace SC.DAL.Dapper
             return lookup.Values.ToArray();
         }
 
-        public IEnumerable<Ticket> ReadTickets()
+        private void TicketAndTicketResponseImplementation(object parent, object child)
         {
-            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] INNER JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
+            var ticket = (Ticket)parent;
+            var response = (TicketResponse)child;
 
-            return OneToMany<Ticket, TicketResponse>(sql, (parent, child) =>
-            {
-                var ticket = (Ticket)parent;
-                var response = (TicketResponse)child;
+            if (ticket.Responses == null)
+                ticket.Responses = new List<TicketResponse>();
 
-                if (ticket.Responses == null)
-                    ticket.Responses = new List<TicketResponse>();
-
-                ticket.Responses.Add(response);
-            });
+            ticket.Responses.Add(response);
         }
-        /*
+
+        private void HardwareTicketAndTicketResponseImplemention(object parent, object child)
+        {
+            var ticket = (HardwareTicket)parent;
+            var response = (TicketResponse)child;
+
+            if (ticket.Responses == null)
+                ticket.Responses = new List<TicketResponse>();
+
+            ticket.Responses.Add(response);
+        }
+
         public IEnumerable<Ticket> ReadTickets()
         {
-            var lookup = new Dictionary<int, Ticket>();
-                
             var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] INNER JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
+
+            return OneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation);
+        }
+
+        public Ticket ReadTicket(int ticketNumber)
+        {
+            Ticket ticket;
 
             using (var conn = GetConnection())
             {
                 conn.Open();
 
-                conn.Query<Ticket, TicketResponse, Ticket>(sql, (t, r) =>
-                {
-                    Ticket ticket;
+                var result = conn.Query<string>("SELECT DeviceName AS Result FROM Ticket WHERE TicketNumber = @ticketNumber AND DeviceName IS NOT NULL", new { ticketNumber = ticketNumber }).Count();
 
-                    if (!lookup.TryGetValue(t.TicketNumber, out ticket))
-                    {
-                        lookup.Add(t.TicketNumber, ticket = t);
-                    }
-                    if (ticket.Responses == null)
-                        ticket.Responses = new List<TicketResponse>();
+                if (result == 0)
+                {   //  Reg Ticket
+                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] INNER JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
-                    ticket.Responses.Add(r);
+                    ticket = OneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation, new { ticketNumber = ticketNumber }).Single();
+                }
+                else
+                {   // Hardware Ticket
+                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] INNER JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
-                    return ticket;
-                });
+                    ticket = OneToMany<HardwareTicket, TicketResponse>(sql, HardwareTicketAndTicketResponseImplemention, new { ticketNumber = ticketNumber }).Single();
+                }
 
                 conn.Close();
             }
 
-            return lookup.Values.ToArray();
+            return ticket;
         }
-        */
+
         public Ticket CreateTicket(Ticket ticket)
         {
             var sql = "INSERT INTO Ticket(AccountId, [Text], DateOpened, State, DeviceName) VALUES (@accountId, @text, @dateOpened, @state, @deviceName); SELECT Cast (Scope_Identity() as int);";
@@ -121,31 +126,6 @@ namespace SC.DAL.Dapper
                 ticket.TicketNumber = conn.Query<int>(sql, insertData).Single();
                 conn.Close();
             }
-            return ticket;
-        }
-
-        public Ticket ReadTicket(int ticketNumber)
-        {
-            Ticket ticket;
-
-            using (var conn = GetConnection())
-            {
-                conn.Open();
-
-                var result = conn.Query<string>("SELECT DeviceName AS Result FROM Ticket WHERE TicketNumber = @ticketNumber AND DeviceName IS NOT NULL", new { ticketNumber = ticketNumber }).Count();
-
-                if (result == 0)
-                { //  Reg Ticket
-                    ticket = conn.Query<Ticket>("SELECT TicketNumber, AccountId, [Text], DateOpened, State FROM Ticket WHERE TicketNumber = @ticketNumber", new { ticketNumber = ticketNumber }).Single();
-                }
-                else
-                { // Hardware Ticket
-                    ticket = conn.Query<HardwareTicket>("SELECT TicketNumber, AccountId, [Text], DateOpened, State, DeviceName FROM Ticket WHERE TicketNumber = @ticketNumber", new { ticketNumber = ticketNumber }).Single();
-                }
-
-                conn.Close();
-            }
-
             return ticket;
         }
 
