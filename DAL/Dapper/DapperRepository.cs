@@ -90,13 +90,13 @@ namespace SC.DAL.Dapper
 
                 if (result == 0)
                 {   //  Reg Ticket
-                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] INNER JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
                     ticket = OneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation, new { ticketNumber = ticketNumber }).Single();
                 }
                 else
                 {   // Hardware Ticket
-                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] INNER JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
                     ticket = OneToMany<HardwareTicket, TicketResponse>(sql, HardwareTicketAndTicketResponseImplemention, new { ticketNumber = ticketNumber }).Single();
                 }
@@ -200,7 +200,7 @@ namespace SC.DAL.Dapper
 
         private IEnumerable<TicketResponse> ReadTicketResponsesOfTicket(int ticketNumber, SqlConnection conn)
         {
-            var sql = "SELECT TicketResponse.Id AS Id, TicketResponse.[Text] AS Text, [Date], IsClientResponse FROM TicketResponse INNER JOIN Ticket ON Ticket.TicketNumber = TicketResponse.Ticket_TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+            var sql = "SELECT TicketResponse.Id AS Id, TicketResponse.[Text] AS Text, [Date], IsClientResponse FROM TicketResponse LEFT JOIN Ticket ON Ticket.TicketNumber = TicketResponse.Ticket_TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
             /*
             Dapper mapping to a different columnname
