@@ -34,10 +34,6 @@
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dapper.Contrib, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapper.Contrib.1.43\lib\net45\Dapper.Contrib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -58,8 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dapper\DapperContribRepository.cs" />
-    <Compile Include="Dapper\DapperRepository - Copy.cs" />
     <Compile Include="Dapper\DapperRepository.cs" />
     <Compile Include="EF\SupportCenterDbConfiguration.cs" />
     <Compile Include="EF\SupportCenterDbContext.cs" />
