@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SC.BL.Domain.HardwareTicket">
+    <Position X="2.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>HardwareTicket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SC.BL.Domain.Ticket">
+    <Position X="2.75" Y="1.5" Width="1.5" />
+    <AssociationLine Name="State" Type="SC.BL.Domain.TicketState">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.141" Y="0.018" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Responses" Type="SC.BL.Domain.TicketResponse">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.829" Y="0.029" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAIAAAAgAAAAAAAAAAAABAAAAADAAAAAA=</HashCode>
+      <FileName>Ticket.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="State" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Responses" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="SC.BL.Domain.TicketResponse">
+    <Position X="7" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAACAAAAAAAAAAAAAAABAIAACAAAAAA=</HashCode>
+      <FileName>TicketResponse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="SC.BL.Domain.TicketState">
+    <Position X="5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAACBAAA=</HashCode>
+      <FileName>TicketState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

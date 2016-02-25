@@ -1,0 +1,131 @@
+﻿@model SC.BL.Domain.Ticket
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Ticket</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TicketNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TicketNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AccountId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AccountId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Text)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Text)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOpened)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateOpened)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.State)
+        </dt>
+
+        <dd>
+            <span id="state">@Html.DisplayFor(model => model.State)</span>
+            @if (Model.State != SC.BL.Domain.TicketState.Closed)
+            {
+                <button type="button" class="btn btn-default btn-xs"
+                        onclick="closeTicket(@Model.TicketNumber)">
+                    Close
+                </button>
+            }
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.TicketNumber }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+<h4>Responses</h4>
+@*@Html.Partial("_TicketResponsesPartial", Model.Responses)*@
+@* /* OF: via ViewBag */ *@
+@*@Html.Partial("_TicketResponsesPartial", (IEnumerable<SC.BL.Domain.TicketResponse>)ViewBag.Responses)*@
+@* /* OF: via AJAX-call */ *@
+<p><button class="btn btn-default" onclick="loadResponsesOfTicket(@Model.TicketNumber)">Laad antwoorden</button></p>
+<div id="addNewResponse" style="display: none">
+    <table id="responses" class="table">
+        <tr><th>Response</th><th>Date</th><th>IsClientResponse</th></tr>
+    </table>
+    <input id="responseText" name="responseText" type="text" class="form-control"
+           style="width: 300px; float: left; margin-right: 5px" />
+    <button type="button" class="btn btn-default" onclick="postResponse()">Verzenden</button>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        // Toon responses
+        function loadResponsesOfTicket(ticketNumber) {
+            $.ajax('/api/TicketResponse?ticketnumber='+ticketNumber, {
+                type: 'GET',
+                dataType: 'json' // data-type expected back (response-data parsed to object)
+            })
+            .done(function (data) { showTicketResponses(data); })
+            .fail(function () { alert('Oeps, something went wrong!'); });
+        }
+        function showTicketResponses(responses) {
+            $.each(responses, function (index, value) { addResponseToList(value); });
+            $("#addNewResponse").show();
+        }
+        function addResponseToList(response) {
+            var date = new Date(response.Date);
+            var checked = response.IsClientResponse ? 'checked="checked"' : '';
+            $('table#responses').append('<tr><td>' + response.Text + '</td>'
+              + '<td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>'
+              + '<td><input type="checkbox" class="check-box" disabled="disabled" ' + checked + ' /></td></tr>');
+        }
+
+        // Voeg nieuw response toe
+        function postResponse() {
+            var ticketNumber = '@Model.TicketNumber';
+            var response = $('#responseText').val();
+            if (response != '') {
+                $.ajax('/api/TicketResponse', {
+                    type: 'POST',
+                    data: JSON.stringify({ ticketNumber: ticketNumber, responseText: response, isClientResponse: false }),
+                    contentType : 'application/json', // data-type send to server
+                    dataType: 'json' // data-type expected back (response-data parsed to object)
+                })
+                .done(function (data) { addResponseToList(data); $('#responseText').val(''); })
+                .fail(function () { alert('Oeps, something went wrong!'); });
+            }
+        }
+
+        // Wijzig 'State' naar 'Closed'
+        function closeTicket(ticketNumber) {
+            $.ajax('/api/Ticket/' + ticketNumber + '/State/Closed', {
+                type: 'PUT'
+            })
+            .done(function (data) {
+                $('#state').html('Closed');
+            })
+            .fail(function () { alert('Oeps, something went wrong!'); });
+        }
+    </script>
+}
