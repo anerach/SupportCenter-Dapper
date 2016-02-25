@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="HardwareTicket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ticket - Copy.cs" />
     <Compile Include="Ticket.cs" />
     <Compile Include="TicketResponse.cs" />
     <Compile Include="TicketState.cs" />
