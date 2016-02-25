@@ -16,7 +16,7 @@ namespace SC.UI.Web.MVC.Controllers.Api
         private ITicketManager mgr = new TicketManager();
 
         [Route("api/Ticket/{id}")]
-        public IHttpActionResult getSingle(int id)
+        public IHttpActionResult GetSingle(int id)
         {
             Ticket ticket = mgr.GetTicket(id);
             if (ticket == null)
