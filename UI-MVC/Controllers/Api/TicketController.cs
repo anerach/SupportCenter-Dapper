@@ -26,6 +26,32 @@ namespace SC.UI.Web.MVC.Controllers.Api
             return Ok(ticket);
         }
 
+        public IHttpActionResult Post([FromBody] Ticket ticket)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Ticket returnTicket = mgr.AddTicket(ticket.AccountId, ticket.Text);
+            return CreatedAtRoute("DefaultApi", new { controller = "Ticket", TicketNumber = ticket.TicketNumber },
+                returnTicket);
+        }
+
+        //[HttpDelete] // Werkte niet zonder?
+        [Route("api/Ticket/{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            Ticket ticketToDelete = mgr.GetTicket(id);
+            if (ticketToDelete == null)
+            {
+                return NotFound();
+            }
+
+            mgr.RemoveTicket(id);
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
         [Route("api/Ticket/All")]
         public IHttpActionResult GetAll()
         {

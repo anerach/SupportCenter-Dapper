@@ -37,6 +37,7 @@ namespace SC.UI.Web.MVC.Controllers.Api
             //                      createdResponse);
 
             // Gebruik DTO (Data Transfer Object)
+
             TicketResponseDTO responseData = new TicketResponseDTO()
             {
                 Id = createdResponse.Id,
