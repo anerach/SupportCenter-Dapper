@@ -18,64 +18,43 @@ namespace SC.DAL.Dapper
             var connectionString = ConfigurationManager.ConnectionStrings["SupportCenterDB_Dapper"].ConnectionString;
             return new SqlConnection(connectionString);
         }
-
-        private delegate void OneToManyDelegate(object parent, object child);
-
-        private IEnumerable<TParent> OneToMany<TParent, TChild>(string sql, OneToManyDelegate oneToMany, object data = null)
+        
+        private Ticket TicketAndTicketResponseImplementation(Ticket ticket, TicketResponse response)
         {
-            var lookup = new Dictionary<int, TParent>();
-
-            using (var conn = GetConnection())
-            {
-                conn.Open();
-
-                conn.Query<TParent, TChild, TParent>(sql, (p, c) =>
-                {
-                    TParent parent;
-
-                    if (!lookup.TryGetValue(p.GetHashCode(), out parent))
-                    {
-                        lookup.Add(p.GetHashCode(), parent = p);
-                    }
-
-                    oneToMany(parent, c);
-
-                    return parent;
-                }, data);
-
-                conn.Close();
-            }
-
-            return lookup.Values.ToArray();
-        }
-
-        private void TicketAndTicketResponseImplementation(object parent, object child)
-        {
-            var ticket = (Ticket)parent;
-            var response = (TicketResponse)child;
-
             if (ticket.Responses == null)
                 ticket.Responses = new List<TicketResponse>();
 
             ticket.Responses.Add(response);
+
+            return ticket;
         }
 
-        private void HardwareTicketAndTicketResponseImplemention(object parent, object child)
+        private HardwareTicket HardwareTicketAndTicketResponseImplemention(HardwareTicket ticket, TicketResponse response)
         {
-            var ticket = (HardwareTicket)parent;
-            var response = (TicketResponse)child;
-
             if (ticket.Responses == null)
                 ticket.Responses = new List<TicketResponse>();
 
             ticket.Responses.Add(response);
+
+            return ticket;
         }
 
         public IEnumerable<Ticket> ReadTickets()
         {
-            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
+            IEnumerable<Ticket> tickets;
 
-            return OneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation);
+            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
+            
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                tickets = conn.QueryOneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation);
+
+                conn.Close();
+            }
+
+            return tickets;
         }
 
         public Ticket ReadTicket(int ticketNumber)
@@ -92,13 +71,13 @@ namespace SC.DAL.Dapper
                 {   //  Reg Ticket
                     var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
-                    ticket = OneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation, new { ticketNumber = ticketNumber }).Single();
+                    ticket = conn.QueryOneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation, new { ticketNumber = ticketNumber }).Single();
                 }
                 else
                 {   // Hardware Ticket
                     var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
 
-                    ticket = OneToMany<HardwareTicket, TicketResponse>(sql, HardwareTicketAndTicketResponseImplemention, new { ticketNumber = ticketNumber }).Single();
+                    ticket = conn.QueryOneToMany<HardwareTicket, TicketResponse>(sql, HardwareTicketAndTicketResponseImplemention, new { ticketNumber = ticketNumber }).Single();
                 }
 
                 conn.Close();
@@ -198,29 +177,17 @@ namespace SC.DAL.Dapper
             }
         }
 
-        private IEnumerable<TicketResponse> ReadTicketResponsesOfTicket(int ticketNumber, SqlConnection conn)
-        {
-            var sql = "SELECT TicketResponse.Id AS Id, TicketResponse.[Text] AS Text, [Date], IsClientResponse FROM TicketResponse LEFT JOIN Ticket ON Ticket.TicketNumber = TicketResponse.Ticket_TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
-
-            /*
-            Dapper mapping to a different columnname
-            ie in db it's first_name but in object it's firstName
-            SELECT first_name as firstName...
-            Then maps automatically
-            */
-
-            return conn.Query<TicketResponse>(sql, new { ticketNumber = ticketNumber });
-        }
-
         public IEnumerable<TicketResponse> ReadTicketResponsesOfTicket(int ticketNumber)
         {
             IEnumerable<TicketResponse> responses;
 
+            var sql = "SELECT TicketResponse.* FROM TicketResponse LEFT JOIN Ticket ON Ticket.TicketNumber = TicketResponse.Ticket_TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+            
             using (var conn = GetConnection())
             {
                 conn.Open();
 
-                responses = ReadTicketResponsesOfTicket(ticketNumber, conn);
+                responses = conn.Query<TicketResponse>(sql, new { ticketNumber = ticketNumber });
 
                 conn.Close();
             }

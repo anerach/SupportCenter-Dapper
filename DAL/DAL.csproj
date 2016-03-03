@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dapper\DapperRepository.cs" />
+    <Compile Include="Dapper\Extensions.cs" />
     <Compile Include="EF\SupportCenterDbConfiguration.cs" />
     <Compile Include="EF\SupportCenterDbContext.cs" />
     <Compile Include="EF\SupportCenterDbInitializer.cs" />
