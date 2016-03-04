@@ -41,9 +41,6 @@ namespace SC.DAL.Dapper
             
         public IEnumerable<Ticket> ReadTickets()
         {
-<<<<<<< HEAD
-            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber ORDER BY Ticket.TicketNumber";
-=======
             IEnumerable<Ticket> tickets;
 
             var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
@@ -51,7 +48,6 @@ namespace SC.DAL.Dapper
             using (var conn = GetConnection())
             {
                 conn.Open();
->>>>>>> 809851dadd3f9651e347f3cea93d0072adcb3e39
 
                 tickets = conn.QueryOneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation);
 
