@@ -70,10 +70,10 @@ namespace SC.DAL.Dapper
 
             ticket.Responses.Add(response);
         }
-
+            
         public IEnumerable<Ticket> ReadTickets()
         {
-            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
+            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber ORDER BY Ticket.TicketNumber";
 
             return OneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation);
         }
