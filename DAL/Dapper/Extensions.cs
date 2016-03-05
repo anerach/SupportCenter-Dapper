@@ -16,12 +16,17 @@ namespace SC.DAL.Dapper
             {
                 TParent parent;
 
-                if (!lookup.TryGetValue(p.GetHashCode(), out parent))
+                if (!lookup.ContainsKey(p.GetHashCode()))
                 {
-                    lookup.Add(p.GetHashCode(), parent = p);
+                    lookup.Add(p.GetHashCode(), p);
+                    parent = p;
                 }
-
-                return func(p, c);
+                else
+                {
+                    parent = lookup[p.GetHashCode()];
+                }
+                
+                return func(parent, c);
 
             }, data, splitOn: splitOn);
 
