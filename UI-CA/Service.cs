@@ -12,7 +12,7 @@ namespace SC.UI.CA
 {
   internal class Service
   {
-    private const string baseUri = "http://localhost:51150/api/";
+    private const string baseUri = "http://dappersupportcenter.azurewebsites.net/api/";
     //private const string baseUri = "http://localhost.fiddler:51150/api/"; // use this when using fiddler to capture traffic! 
 
     public IEnumerable<TicketResponse> GetTicketResponses(int ticketNumber)

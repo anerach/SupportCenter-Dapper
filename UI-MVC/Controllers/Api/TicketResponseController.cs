@@ -31,13 +31,14 @@ namespace SC.UI.Web.MVC.Controllers.Api
             if (createdResponse == null)
                 return BadRequest("Er is iets misgelopen bij het registreren van het antwoord!");
 
+
             //// Circulaire referentie!! (TicketResponse <-> Ticket) -> can't be serialized!!
             //return CreatedAtRoute("DefaultApi",
             //                      new { Controller = "TicketResponse", id = createdResponse.Id },
             //                      createdResponse);
 
             // Gebruik DTO (Data Transfer Object)
-
+            
             TicketResponseDTO responseData = new TicketResponseDTO()
             {
                 Id = createdResponse.Id,

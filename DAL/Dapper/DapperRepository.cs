@@ -135,6 +135,7 @@ namespace SC.DAL.Dapper
                     text = ticket.Text,
                     dateOpened = ticket.DateOpened,
                     state = ticket.State, // Null or other if typeof()... Fix at home //Situering in de rest
+                    deviceName = (string)null,
                     ticketNumber = ticket.TicketNumber
                 };
             }
