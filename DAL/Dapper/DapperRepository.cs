@@ -43,7 +43,7 @@ namespace SC.DAL.Dapper
         {
             IEnumerable<Ticket> tickets;
 
-            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber";
+            var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber ORDER BY Ticket.TicketNumber, TicketResponse.Date";
             
             using (var conn = GetConnection())
             {
@@ -69,13 +69,13 @@ namespace SC.DAL.Dapper
 
                 if (result == 0)
                 {   //  Reg Ticket
-                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber ORDER BY TicketResponse.Date";
 
                     ticket = conn.QueryOneToMany<Ticket, TicketResponse>(sql, TicketAndTicketResponseImplementation, new { ticketNumber = ticketNumber }).Single();
                 }
                 else
                 {   // Hardware Ticket
-                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+                    var sql = "SELECT Ticket.*, TicketResponse.* FROM [Ticket] LEFT JOIN [TicketResponse] ON TicketResponse.Ticket_TicketNumber = Ticket.TicketNumber WHERE Ticket.TicketNumber = @ticketNumber ORDER BY TicketResponse.Date";
 
                     ticket = conn.QueryOneToMany<HardwareTicket, TicketResponse>(sql, HardwareTicketAndTicketResponseImplemention, new { ticketNumber = ticketNumber }).Single();
                 }
@@ -182,7 +182,7 @@ namespace SC.DAL.Dapper
         {
             IEnumerable<TicketResponse> responses;
 
-            var sql = "SELECT TicketResponse.* FROM TicketResponse LEFT JOIN Ticket ON Ticket.TicketNumber = TicketResponse.Ticket_TicketNumber WHERE Ticket.TicketNumber = @ticketNumber";
+            var sql = "SELECT TicketResponse.* FROM TicketResponse LEFT JOIN Ticket ON Ticket.TicketNumber = TicketResponse.Ticket_TicketNumber WHERE Ticket.TicketNumber = @ticketNumber ORDER BY TicketResponse.Date";
             
             using (var conn = GetConnection())
             {
