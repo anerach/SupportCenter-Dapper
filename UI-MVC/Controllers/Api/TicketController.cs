@@ -38,7 +38,7 @@ namespace SC.UI.Web.MVC.Controllers.Api
                 returnTicket);
         }
 
-        //[HttpDelete] // Werkte niet zonder?
+        [HttpDelete]
         [Route("api/Ticket/{id}")]
         public IHttpActionResult Delete(int id)
         {
